@@ -15,7 +15,7 @@ def main():
     string = "".join(input("Enter String : ").split()).strip()
     is_pos_int = False
     pos = None
-
+    # check for position is a number or not
     while not is_pos_int:
         pos = input("Enter position : ")
         is_pos_int = pos.isnumeric()
