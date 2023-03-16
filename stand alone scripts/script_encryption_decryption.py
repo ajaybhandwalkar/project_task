@@ -8,25 +8,22 @@ class EncryptionAndDecryption:
         key = self.get_encryption_key()
         self.f = Fernet(key)
 
-
     @staticmethod
     def get_encryption_key():
-        enc_key = None
-        if os.path.exists("encryption_key.txt"):
-            if os.path.getsize('encryption_key.txt') == 0:
-                res = input("Encryption key not found!\n\nDo you want to generate new key (y/n) : ")
-                if res in "yY":
-                    key = Fernet.generate_key()
-                    enc_key = key
-                    open("encryption_key.txt", "w").write(key.decode('UTF-8'))
+        if not os.path.exists("encryption_key.txt"):
+            return EncryptionAndDecryption.get_encryption_key()
+        else:
+            if not os.stat("encryption_key.txt").st_size == 0:
+                return str.encode(open("encryption_key.txt", "r").read())
             else:
-                enc_key = str.encode(open("encryption_key.txt", "r").read())
-        else:
-            print("Encryption_key file missing...")
-        if enc_key is not None:
-            return enc_key
-        else:
-            raise Exception("Exception Occurred")
+                return EncryptionAndDecryption.generate_encryption_key()
+
+    @staticmethod
+    def generate_encryption_key():
+        key = Fernet.generate_key()
+        enc_key = key
+        open("encryption_key.txt", "w").write(key.decode('UTF-8'))
+        return enc_key
 
     def encrypt(self, word):
         return self.f.encrypt(str.encode(word))
@@ -34,17 +31,21 @@ class EncryptionAndDecryption:
     def decrypt(self, word):
         return self.f.decrypt(str.encode(word))
 
+    @staticmethod
+    def get_word_to_encrypt():
+        return input("Enter Word : ")
+
     def main(self):
         while True:
-            option = input("\nSelect Option -\n1.Encrypt\n2.Decrypt\n3.Exit\n: ")
-            if option == "3":
+            option = input("\nSelect Option -\n1.Encrypt\n2.Decrypt\n9.Exit\n: ")
+            if option == "9":
                 break
             if option == "1":
-                word = input("Enter Word : ")
+                word = EncryptionAndDecryption.get_word_to_encrypt()
                 encrypted_word = self.encrypt(word)
                 print("\n", encrypted_word.decode('UTF-8'))
-            if option == "2":
-                word = input("Enter Word : ")
+            elif option == "2":
+                word = EncryptionAndDecryption.get_word_to_encrypt()
                 decrypted_word = self.decrypt(word)
                 print("\n", decrypted_word.decode('UTF-8'))
             else:
@@ -54,9 +55,6 @@ class EncryptionAndDecryption:
 if __name__ == '__main__':
     obj = EncryptionAndDecryption()
     obj.main()
-
-
-
 
 # from hashlib import md5
 # import requests
